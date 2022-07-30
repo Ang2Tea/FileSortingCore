@@ -9,7 +9,6 @@ namespace FileSorting.Core.Configs
         [JsonPropertyName("change_state")]
         public ChangeNameState ChangeState { get; set; }
 
-        //public StandartConfig() : this(string.Empty, default) { }
         public StandartConfig(string sortingPath, ChangeNameState changeState)
         {
             SortingPath = sortingPath;

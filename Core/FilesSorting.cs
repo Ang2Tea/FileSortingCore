@@ -9,7 +9,7 @@ namespace FileSorting.Core
         private readonly ILogger log;
         private readonly ISortingConfig config;
 
-        public List<FileToMove> ListFile { get; set; }
+        internal List<FileToMove> ListFile { get; set; }
 
         public FilesSorting(ISortingConfig config, ILogger log)
         {
