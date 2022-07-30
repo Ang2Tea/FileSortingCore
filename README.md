@@ -1,4 +1,4 @@
-# Сортировка файлов
+# FileSortingCore
 ## Оглавление 
 1. [Цель проекта](#ProjectGoals)
 2. [Элементы библиотеки](#LibraryElements)
