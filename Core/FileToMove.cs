@@ -3,7 +3,7 @@ using FileSorting.Core.Exceptions;
 
 namespace FileSorting.Core
 {
-    public class FileToMove
+    internal class FileToMove
     {
         private readonly string fileNameOnly;
 
