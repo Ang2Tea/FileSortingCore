@@ -18,8 +18,7 @@ namespace FileSorting.Core
             ListFile = new();
             foreach (string fileDir in Directory.GetFiles(this.config.SortingPath))
             {
-                FileToMove file = new(this.config.SortingPath, new FileInfo(fileDir));
-                file.IgnoreChangeName += this.log.ErrorLog;
+                FileToMove file = new(this.config, new FileInfo(fileDir), this.log);
                 ListFile.Add(file);
             }
         }
@@ -37,8 +36,7 @@ namespace FileSorting.Core
 
                 if (file.FileExists)
                 {
-                    file.MovingFile(config.ChangeState);
-                    log.InfoLog($"File {file.ChangeFile} completed");
+                    file.MovingFile();
                 }
             }
         }

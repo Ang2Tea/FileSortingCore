@@ -1,52 +1,58 @@
 ﻿using FileSorting.Core.Configs;
 using FileSorting.Core.Exceptions;
+using FileSorting.Logging;
+using FileSorting.Logging.SpecificLogger;
 
 namespace FileSorting.Core
 {
     internal class FileToMove
     {
         private readonly string fileNameOnly;
+        private readonly ISortingConfig config;
+        private readonly ILogger log;
+        private readonly FileInfo file;
 
-        public FileInfo ChangeFile { get;  init; }
         public string CurrentPath { get; set; }
         public bool DirectoryExists { get => Directory.Exists(CurrentPath); }
-        public bool FileExists { get => ChangeFile.Exists; }
+        public bool FileExists { get => file.Exists; }
 
-        public event Action<string>? IgnoreChangeName;
-
-        public FileToMove(string mainDirectory, FileInfo currentFile)
+        public FileToMove(ISortingConfig config, FileInfo currentFile) : this(config, currentFile, new NullLogger()) { }
+        public FileToMove(ISortingConfig config, FileInfo currentFile, ILogger logger)
         {
-            ChangeFile = currentFile;
-            fileNameOnly = ChangeFile.Name.Split(".")[0];
-            CurrentPath = mainDirectory + "\\" + ChangeFile.Extension[1..].ToUpper();
+            file = currentFile;
+            this.config = config;
+            log = logger;
+            fileNameOnly = this.file.Name.Split(".")[0];
+            CurrentPath = config.SortingPath + "\\" + file.Extension[1..].ToUpper();
         }
 
         private bool MovedFile(string filePath)
         {
             if (!File.Exists(filePath))
             {
-                ChangeFile.MoveTo(filePath);
+                file.MoveTo(filePath);
+                log.InfoLog($"File {file} moved");
                 return true;
             }
             return false;
         }
-        public void MovingFile(ChangeNameState changeName)
+        public void MovingFile()
         {
-            string currentFilePath = CurrentPath + "\\" + ChangeFile.Name;
+            string currentFilePath = CurrentPath + "\\" + file.Name;
 
             for (int i = 1; !MovedFile(currentFilePath); i++)
             {
-                switch (changeName)
+                switch (config.ChangeState)
                 {
-                    case ChangeNameState.Exception: throw new NameTakenException(ChangeFile, $"File {ChangeFile.Name} already exists in the correct directory");
+                    case ChangeNameState.Exception: throw new NameTakenException(file, $"File {file} already exists in the correct directory");
                     case ChangeNameState.Ignoring:
                         {
-                            IgnoreChangeName?.Invoke($"File {ChangeFile.Name} already exists in the correct directory");
+                            log.ErrorLog($"File {file.Name} already exists in the correct directory");
                             return;
                         }
                     case ChangeNameState.Change:
                         {
-                            currentFilePath = CurrentPath + "\\" + fileNameOnly + $"({i})" + ChangeFile.Extension;
+                            currentFilePath = CurrentPath + "\\" + fileNameOnly + $"({i})" + file.Extension;
                             break;
                         }
                 }
